@@ -56,6 +56,10 @@ object Utils {
         }
     }
 
+    private val stars = listOf("", "➊", "➋", "➌", "➍", "➎")
+    fun getStar(star: Int): String = "§c" + stars[star]
+
+
     fun getRarityBelow(rarity: String): String {
         return when(rarity) {
             "VERY_SPECIAL", "SPECIAL", "EXCLUSIVE", "SUPREME", "MYTHIC" -> "LEGENDARY"

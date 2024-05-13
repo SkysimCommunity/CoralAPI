@@ -27,16 +27,21 @@ fun Route.itemsRoute() {
             //
             val type = call.request.queryParameters["type"]
             //
+            val additional = mutableMapOf<String, Any>()
+            //
+            if(call.parameters["withInfo"] != null) {
+                additional["info"] = API.getPlayerInfo(apiKey, username)
+            }
             //
             if(type == null) {
-                call.respond(HttpStatusCode.OK, API.getPlayerItems(apiKey, username))
+                call.respond(HttpStatusCode.OK, API.getPlayerItems(apiKey, username) + additional)
             } else {
                 if(!API.ITEM_TYPES.contains(type)) {
                     call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Unknown type parameter!"))
                     return@get
                 }
                 //
-                call.respond(HttpStatusCode.OK, API.getPlayerItems(apiKey, username, type))
+                call.respond(HttpStatusCode.OK, API.getPlayerItems(apiKey, username, type) + additional)
             }
         }
     }
