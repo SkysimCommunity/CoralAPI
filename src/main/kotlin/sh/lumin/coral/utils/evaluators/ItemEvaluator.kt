@@ -7,11 +7,6 @@ val ITEM_PRICE_MAP = mutableMapOf(
     "HIDDEN_EXCRARION" to 2_000_000,
     "HIDDEN_DIMOONIZARY_DAGGER" to 600_000,
     //
-    "HIDDEN_GOLDEN_TIGER_2022" to 450_000, // LEG (450k | lvl1) (550k | lvl 100), MYTH (1.1m | lvl1) (1.5m | lvl 100)
-    "HIDDEN_ARCHIVY" to 350_000, // lvl 100 -> 450k
-    "HIDDEN_MAGICIVY" to 600_000, // lvl 100 -> 1m
-    "HIDDEN_USSR_T34_TANK_PET" to 14_000_000,
-    //
     "HIDDEN_GIGACHAD_HELMET" to 75_000,
     "HIDDEN_GIGACHAD_CHESTPLATE" to 1_300_000,
     "HIDDEN_GIGACHAD_LEGGINGS" to 1_200_000,
@@ -50,6 +45,21 @@ val ITEM_PRICE_MAP = mutableMapOf(
     "HIDDEN_ARCANE_CHESTPLATE" to 4_100_000,
     "HIDDEN_ARCANE_LEGGINGS" to 3_600_000,
     "HIDDEN_ARCANE_BOOTS" to 2_400_000,
+    //
+    "HIDDEN_GRACEFUL_HELMET" to 2_400_000,
+    "HIDDEN_GRACEFUL_CHESTPLATE" to 4_100_000,
+    "HIDDEN_GRACEFUL_LEGGINGS" to 3_600_000,
+    "HIDDEN_GRACEFUL_BOOTS" to 2_400_000,
+    //
+    "HIDDEN_BASTION_HELMET" to 2_400_000,
+    "HIDDEN_BASTION_CHESTPLATE" to 4_100_000,
+    "HIDDEN_BASTION_LEGGINGS" to 3_600_000,
+    "HIDDEN_BASTION_BOOTS" to 2_400_000,
+    //
+    "HIDDEN_SKALDIC_HELMET" to 2_400_000,
+    "HIDDEN_SKALDIC_CHESTPLATE" to 4_100_000,
+    "HIDDEN_SKALDIC_LEGGINGS" to 3_600_000,
+    "HIDDEN_SKALDIC_BOOTS" to 2_400_000,
     // MINING
     // PETS
     "HIDDEN_RADIOACTIVE_GOLEM" to 420_000, // unknown max!
@@ -119,20 +129,38 @@ val ITEM_PRICE_MAP = mutableMapOf(
 
 object ItemEvaluator {
     fun valueItem(item: JsonObject): Int {
-        val tE = item.get("type") ?: return 0;
-        if(tE.isJsonNull) return 0;
-        val type = tE.asString ?: return 0
+        val typeElement = item["type"] ?: return 0
+        if (typeElement.isJsonNull) return 0
+        val type = typeElement.asString ?: return 0
         //
-        var value = 0
-        // base_value
-        value += ITEM_PRICE_MAP[type] ?: 0
+        if(item.has("xp")) {
+            return PetEvaluator.valuePet(item)
+        }
         //
-        val lore = item.get("lore") ?: return value
-        if(lore.isJsonNull) return 0
-        //
-        val enchantmentsValue = EnchantmentEvaluator.valueEnchants(lore.asJsonArray.map { it.asString })
+        var value = ITEM_PRICE_MAP[type] ?: 0
+
+        val quantityElement = item["amount"]
+        if (quantityElement != null && !quantityElement.isJsonNull) {
+            value *= quantityElement.asInt
+        }
+
+        val nameElement = item["name"]
+        if (nameElement != null && !nameElement.isJsonNull) {
+            val name = nameElement.asString
+            if (quantityElement?.asInt != 1) {
+                item.remove("name")
+                item.addProperty("name", "${quantityElement}x $name")
+            }
+        }
+
+        val loreElement = item["lore"] ?: return value
+        if (loreElement.isJsonNull) return 0
+
+        val enchantmentsValue = EnchantmentEvaluator.valueEnchants(loreElement.asJsonArray.map { it.asString })
         value += enchantmentsValue
-        // Essence etc...
+
+        value += StarEvaluator.valueItem(item)
+
         return value
     }
 }

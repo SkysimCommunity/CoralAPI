@@ -44,6 +44,30 @@ object Utils {
         return true
     }
 
+    fun getRarityByName(name: String): String {
+        return when(name.substring(0, 2)) {
+            "§c", "§b", "§d" -> "MYTHIC"
+            "§6" -> "LEGENDARY"
+            "§5" -> "EPIC"
+            "§9" -> "RARE"
+            "§a" -> "UNCOMMON"
+            "§f" -> "COMMON"
+            else -> ""
+        }
+    }
+
+    fun getRarityBelow(rarity: String): String {
+        return when(rarity) {
+            "VERY_SPECIAL", "SPECIAL", "EXCLUSIVE", "SUPREME", "MYTHIC" -> "LEGENDARY"
+            "LEGENDARY" -> "EPIC"
+            "EPIC" -> "RARE"
+            "RARE" -> "UNCOMMON"
+            "UNCOMMON" -> "COMMON"
+            "COMMON" -> ""
+            else -> ""
+        }
+    }
+
     fun parseRomanNumeral(roman: String): Int {
         val map = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
         var result = 0
