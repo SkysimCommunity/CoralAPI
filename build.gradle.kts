@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "sh.lumin"
-version = "0.0.1"
+version = "0.0.2"
 
 application {
     mainClass.set("sh.lumin.coral.ApplicationKt")

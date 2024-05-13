@@ -34,6 +34,20 @@ object API {
         return itemMap
     }
     //
+    fun getPlayerMoney(apiKey: String, name: String): Triple<Long, Double, Double> {
+        val request = Request.Builder().get()
+            .url("$baseURL?key=$apiKey&type=PLAYER_INFO&param=$name").build()
+        val response = client.newCall(request).execute()
+        //
+        val info = gson.fromJson(response.body?.string(), JsonObject::class.java)
+        //
+        return Triple(
+            info.get("bits").asLong,
+            info.get("coins").asDouble,
+            info.get("bankCoins").asDouble
+        )
+    }
+    //
     fun getPlayerItems(apiKey: String, name: String, type: String): Map<String, JsonArray> {
         val request = Request.Builder()
             .get()
